@@ -1,1 +1,5 @@
 SELECT s.nom, v.nom, v.prenom FROM service s INNER JOIN appartient USING(id_service) JOIN vendeur v USING(id_vendeur);
+SELECT c.nom,c.prenom,v.ville,p.designation FROM client c JOIN ville v USING(id_ville) JOIN commande USING(id_client) JOIN ligne_commande USING(id_commande) JOIN produit p USING(id_produit) WHERE LOWER(c.nom) = 'cnam' GROUP BY c.nom,c.prenom,v.ville,p.id_produit
+SELECT v.nom,v.prenom, COUNT(*) FROM vendeur v JOIN appartient USING(id_vendeur)  GROUP BY v.id_vendeur	
+SELECT p.designation FROM produit p JOIN ligne_commande USING(id_produit) JOIN commande c USING(id_commande) WHERE c.date BETWEEN '2005-01-01' AND '2005-12-31' GROUP BY p.id_produit 
+SELECT c.id_commande, c.date, c.montant_ht, (SELECT ) FROM commande c JOIN remise r USING(id_remise) JOIN ligne_commande l USING(id_commande) JOIN produit  p USING(id_produit) 
