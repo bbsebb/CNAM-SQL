@@ -3,19 +3,18 @@ FROM service s
 JOIN appartient USING(id_service) 
 JOIN vendeur v USING(id_vendeur);
 
-/*2*/SELECT c.nom,c.prenom,v.ville,p.designation 
+/*2*/SELECT DISTINCT c.nom,c.prenom,v.ville,p.designation 
 FROM client c 
 JOIN ville v USING(id_ville) 
 JOIN commande USING(id_client) 
 JOIN ligne_commande USING(id_commande) 
 JOIN produit p USING(id_produit) 
 WHERE LOWER(c.nom) = 'cnam' 
-GROUP BY c.nom,c.prenom,v.ville,p.id_produit;
 
 /*3*/SELECT v.nom,v.prenom, COUNT(*) 
 FROM vendeur v 
 JOIN appartient USING(id_vendeur)  
-GROUP BY v.id_vendeur	;
+GROUP BY v.id_vendeur having COUNT(*) >= 2;
 
 /*4*/SELECT DISTINCT p.designation 
 FROM produit p 
