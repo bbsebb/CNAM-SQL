@@ -7,3 +7,6 @@ FROM produit
 WHERE LENGTH(descriptif ) = (
     SELECT MAX(LENGTH(descriptif ))
     FROM produit);
+/* 3 */
+SELECT "0033" || SUBSTR(TRIM(tel_mobile),1,LENGTH(TRIM(tel_mobile))) 
+FROM client;
