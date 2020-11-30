@@ -137,3 +137,14 @@ WHERE id_auditeur NOT IN (
     FROM inscrire 
     WHERE i.id_ue = 'NFA001' AND (i.note1>=10 OR i.note2>=10))
 -- 8.9
+SELECT s1.id_auditeur,a.nom,a.prenom ,
+	CASE
+	WHEN count(s1.id_auditeur)>1 THEN 'Différent tarif utilisé'
+	ELSE 'Un seul tarif utilisé'
+	END
+FROM (SELECT id_tarif,id_auditeur,count(DISTINCT id_auditeur)
+FROM inscription
+GROUP BY id_auditeur,id_tarif) AS s1
+JOIN auditeur a USING(id_auditeur)
+GROUP BY s1.id_auditeur,a.nom,a.prenom
+ORDER BY 1
