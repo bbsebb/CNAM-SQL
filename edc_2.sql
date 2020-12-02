@@ -8,7 +8,7 @@ CREATE TABLE support (
 
 CREATE TABLE etat (
     codeetat int,
-    designationetat int,
+    designationetat VARCHAR,
     PRIMARY KEY (codeetat)
 );
 
@@ -18,7 +18,6 @@ CREATE TABLE emprunteur (
     prenompers varchar,
     adrpers varchar,
     telpers char(14),
-    datenais date,
     PRIMARY KEY (codepers)
 );
 
@@ -52,20 +51,36 @@ CREATE TABLE jouer_un_role (
 );
 
 CREATE TABLE exemplaire (
-    codefilm int,
     numexemplaire int,
+    codefilm int,
     codeetat int,
     codesupport int NOT NULL,
     PRIMARY KEY (codefilm,numexemplaire)
 )
 
 CREATE TABLE emprunt (
-    datepret date,
+    numexemplaire int,
     codepers int,
     codefilm int,
-    numexemplaire int,
+    datepret date,
     dateretour date,
     PRIMARY KEY (datepret,codepers,codefilm,numexemplaire)
 )
 
 -- 6.2
+ALTER TABLE film    ADD CONSTRAINT FK_film_genre FOREIGN KEY (codegenre) REFERENCES genre(codegenre);
+ALTER TABLE jouer_un_role   ADD CONSTRAINT FK_jouer_un_role_film FOREIGN KEY (codefilm) REFERENCES film(codefilm),
+                            ADD CONSTRAINT FK_jouer_un_role_acteur FOREIGN KEY (codeacteur) REFERENCES acteur(codeacteur);
+ALTER TABLE exemplaire  ADD CONSTRAINT FK_exemplaire_film FOREIGN KEY (codefilm) REFERENCES film(codefilm) ON DELETE CASCADE,
+                        ADD CONSTRAINT FK_exemplaire_support FOREIGN KEY (codesupport) REFERENCES support(codesupport),
+                        ADD CONSTRAINT FK_exemplaire_etat FOREIGN KEY (codeetat) REFERENCES etat(codeetat) ON UPDATE CASCADE;
+ALTER TABLE emprunt ADD CONSTRAINT FK_emprunt_emprunteur FOREIGN KEY (codepers) REFERENCES emprunteur(codepers),
+                    ADD CONSTRAINT FK_emprunt_exemplaire FOREIGN KEY (codefilm,numexemplaire) REFERENCES exemplaire(codefilm,numexemplaire) ON DELETE SET NULL;
+
+-- 6.3
+ALTER TABLE film ADD CONSTRAINT CHK_film_duree CHECK( duree >= 0);
+ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour > datepret);
+
+-- 6.4
+
+ALTER TABLE emprunter ADD COLUMN  datenais date;                   
