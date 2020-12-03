@@ -1,4 +1,4 @@
--- 6.1
+-- 1.6.1
 BEGIN TRANSACTION;
 CREATE TABLE support (
     codesupport int,
@@ -59,15 +59,15 @@ CREATE TABLE exemplaire (
 );
 
 CREATE TABLE emprunt (
+        codefilm int,
     numexemplaire int,
     codepers int,
-    codefilm int,
     datepret date,
     dateretour date,
     PRIMARY KEY (datepret,codepers,codefilm,numexemplaire)
 );
 
--- 6.2
+-- 1.6.2
 ALTER TABLE film    ADD CONSTRAINT FK_film_genre FOREIGN KEY (codegenre) REFERENCES genre(codegenre);
 ALTER TABLE jouer_un_role   ADD CONSTRAINT FK_jouer_un_role_film FOREIGN KEY (codefilm) REFERENCES film(codefilm),
                             ADD CONSTRAINT FK_jouer_un_role_acteur FOREIGN KEY (codeacteur) REFERENCES acteur(codeacteur);
@@ -77,10 +77,14 @@ ALTER TABLE exemplaire  ADD CONSTRAINT FK_exemplaire_film FOREIGN KEY (codefilm)
 ALTER TABLE emprunt ADD CONSTRAINT FK_emprunt_emprunteur FOREIGN KEY (codepers) REFERENCES emprunteur(codepers),
                     ADD CONSTRAINT FK_emprunt_exemplaire FOREIGN KEY (codefilm,numexemplaire) REFERENCES exemplaire(codefilm,numexemplaire) ON DELETE SET NULL;
 
--- 6.3
+-- 1.6.3
 ALTER TABLE film ADD CONSTRAINT CHK_film_duree CHECK( duree >= 0);
-ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour > datepret);
+ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour >= datepret);
 
--- 6.4
+-- 1.6.4
 
-ALTER TABLE emprunteur ADD COLUMN  datenais date;                   
+ALTER TABLE emprunteur ADD COLUMN  datenais date;    
+
+-- 2.1
+SELECT titrefilm, resume FROM film
+
