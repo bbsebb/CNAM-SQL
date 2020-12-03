@@ -1,5 +1,5 @@
 -- 6.1
-BEGIN TRANSACTION
+BEGIN TRANSACTION;
 CREATE TABLE support (
     codesupport int,
     intsupport varchar,
@@ -29,9 +29,9 @@ CREATE TABLE acteur (
 );
 
 CREATE TABLE genre (
-    codegenr int,
+    codegenre int,
     intgenre varchar,
-    PRIMARY KEY (codegenr)
+    PRIMARY KEY (codegenre)
 );
 
 CREATE TABLE film (
@@ -40,9 +40,9 @@ CREATE TABLE film (
     annee char(4),
     duree smallint,
     resume text,
-    codegenr int NOT NULL,
+    codegenre int NOT NULL,
     PRIMARY KEY (codefilm)
-)
+);
 
 CREATE TABLE jouer_un_role (
     codefilm int,
@@ -51,12 +51,12 @@ CREATE TABLE jouer_un_role (
 );
 
 CREATE TABLE exemplaire (
-    numexemplaire int,
     codefilm int,
+    numexemplaire int,  
     codeetat int,
     codesupport int NOT NULL,
     PRIMARY KEY (codefilm,numexemplaire)
-)
+);
 
 CREATE TABLE emprunt (
     numexemplaire int,
@@ -65,7 +65,7 @@ CREATE TABLE emprunt (
     datepret date,
     dateretour date,
     PRIMARY KEY (datepret,codepers,codefilm,numexemplaire)
-)
+);
 
 -- 6.2
 ALTER TABLE film    ADD CONSTRAINT FK_film_genre FOREIGN KEY (codegenre) REFERENCES genre(codegenre);
@@ -83,4 +83,4 @@ ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour > datepret)
 
 -- 6.4
 
-ALTER TABLE emprunter ADD COLUMN  datenais date;                   
+ALTER TABLE emprunteur ADD COLUMN  datenais date;                   
