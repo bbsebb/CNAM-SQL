@@ -86,5 +86,13 @@ ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour >= datepret
 ALTER TABLE emprunteur ADD COLUMN  datenais date;    
 
 -- 2.1
-SELECT titrefilm, resume FROM film
+SELECT titrefilm, resume FROM film;
+-- 2.2
+SELECT titrefilm, duree 
+FROM film
+WHERE duree > 90;
+-- 2.3
+SELECT nomacteur || ' ' || prenomacteur 
+FROM acteur
+WHERE prenomacteur IN('Charles','Robert','Gérard');
 
