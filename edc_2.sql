@@ -99,4 +99,67 @@ WHERE prenomacteur IN('Charles','Robert','Gérard');
 SELECT nompers || ' ' || prenompers || ' ' || adrpers 
 FROM emprunteur 
 WHERE LOWER(adrpers) LIKE '%reims%';
-
+-- 2.5
+SELECT titrefilm, annee, duree
+FROM film
+WHERE codegenre = 
+    (SELECT DISTINCT codegenre 
+    FROM genre 
+    WHERE LOWER(intgenre) LIKE '%science-fiction%')
+-- 2.6
+SELECT titrefilm
+FROM film
+WHERE codefilm IN (
+    SELECT DISTINCT codefilm 
+    FROM emprunt
+    WHERE datepret BETWEEN '2001-06-01' AND '2001-09-30')
+-- 2.7
+SELECT titrefilm
+FROM film
+WHERE codefilm IN (
+    SELECT DISTINCT e.codefilm 
+    FROM exemplaire e 
+    JOIN support s USING(codesupport)
+    WHERE s.intsupport = 'VCD')
+-- 2.8
+SELECT titrefilm 
+FROM film
+WHERE codefilm IN (
+    SELECT codefilm 
+    FROM emprunt
+    WHERE dateretour>CURRENT_DATE )
+-- 2.9
+SELECT titrefilm, annee, duree
+FROM film
+WHERE codefilm IN 
+    (SELECT codefilm 
+    FROM acteur 
+    JOIN jouer_un_role USING(codeacteur)
+    WHERE LOWER(prenomacteur) LIKE '%sylvester%' AND LOWER(nomacteur) LIKE '%stallone%')
+-- 2.10
+SELECT titrefilm, annee, duree
+FROM film
+WHERE codefilm IN 
+    (SELECT codefilm 
+    FROM acteur 
+    JOIN jouer_un_role USING(codeacteur)
+    WHERE LOWER(prenomacteur) LIKE '%g_rard%' 
+    AND LOWER(nomacteur) LIKE '%depardieu%' 
+    INTERSECT
+    SELECT codefilm 
+    FROM acteur 
+    JOIN jouer_un_role USING(codeacteur)
+    WHERE LOWER(prenomacteur) LIKE '%christian%' 
+    AND LOWER(nomacteur) LIKE '%clavier%' )
+-- 2.11
+SELECT DISTINCT eteur.nompers || ' ' || eteur.prenompers || ' ' || eteur.adrpers || ' ' || eteur.telpers
+FROM emprunteur eteur
+JOIN emprunt et USING(codepers)
+WHERE et.codefilm IN (
+    SELECT codefilm 
+    FROM film 
+    WHERE LOWER(titrefilm) LIKE '%rambo%' OR
+    LOWER(titrefilm) LIKE '%ast_rix et ob_lix contre c_sar%' OR
+    LOWER(titrefilm) LIKE '%the faculty%');
+-- 2.12
+SELECT 
