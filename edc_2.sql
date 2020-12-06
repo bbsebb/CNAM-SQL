@@ -66,7 +66,6 @@ CREATE TABLE emprunt (
     dateretour date,
     PRIMARY KEY (datepret,codepers,codefilm,numexemplaire)
 );
-
 -- 1.6.2
 ALTER TABLE film    ADD CONSTRAINT FK_film_genre FOREIGN KEY (codegenre) REFERENCES genre(codegenre);
 ALTER TABLE jouer_un_role   ADD CONSTRAINT FK_jouer_un_role_film FOREIGN KEY (codefilm) REFERENCES film(codefilm),
@@ -76,13 +75,10 @@ ALTER TABLE exemplaire  ADD CONSTRAINT FK_exemplaire_film FOREIGN KEY (codefilm)
                         ADD CONSTRAINT FK_exemplaire_etat FOREIGN KEY (codeetat) REFERENCES etat(codeetat) ON UPDATE CASCADE;
 ALTER TABLE emprunt ADD CONSTRAINT FK_emprunt_emprunteur FOREIGN KEY (codepers) REFERENCES emprunteur(codepers),
                     ADD CONSTRAINT FK_emprunt_exemplaire FOREIGN KEY (codefilm,numexemplaire) REFERENCES exemplaire(codefilm,numexemplaire) ON DELETE SET NULL;
-
 -- 1.6.3
 ALTER TABLE film ADD CONSTRAINT CHK_film_duree CHECK( duree >= 0);
 ALTER TABLE emprunt ADD CONSTRAINT CHK_dater_datep CHECK( dateretour >= datepret);
-
 -- 1.6.4
-
 ALTER TABLE emprunteur ADD COLUMN  datenais date;    
 COMMIT;
 -- 2.1
