@@ -1,3 +1,45 @@
+/* 1.5.1
+π titrefilm, resume (FILM)
+1.5.2
+π titrefilm,duree (σ duree > 1h30 (FILM))
+1.5.3
+π titrefilm, nomacteur, prenomacteur (FILM ⋈ JOUER_UN_ROLE ⋈ ACTEUR)
+1.5.4
+π titrefilm, annee, duree (σ intgenre=’science-fiction’ (FILM ⋈ GENRE))
+1.5.5
+π titrefilm (σ intsupport=’VCD’ (FILM ⋈ EXEMPLAIRE ⋈ SUPPORT)
+1.5.6
+π tirefilm, nomacteur, prenomacteur, intgenre (( FILM ⋈ JOUER_UN_ROLE) ⋈ GENRE)
+1.5.7
+π titrefilm, numexemplaire (σ dateretour>’date courante’ (FILM ⋈ EXEMPLAIRE ⋈ EMPRUNT))
+1.5.8
+R1 = σ nomacteur=’Stalone’ (ACTEUR ⋈ JOUER_UN_ROL) 
+R2 = σ prenomacteur = ‘sylverster (ACTEUR ⋈ JOUER_UN_ROLE)
+π titrefilm, annee, duree, intgenre (FILM ⋈  (R1 ∩ R2))
+1.5.9
+R1 = σ nomacteur=’Depardieu’ (ACTEUR ⋈ JOUER_UN_ROLE) 
+R2 = σ prenomacteur = ‘Gérard’ (ACTEUR ⋈ JOUER_UN_ROLE)
+R3 = σ nomacteur = ‘Clavier’ (ACTEUR ⋈ JOUER_UN_ROLE)
+R4 = σ prenomacteur = ‘Christian’ (ACTEUR ⋈ JOUER_UN_ROLE)
+π titrefilm, annee, duree, intgenre (FILM ⋈ (R1 ∩ R2 ∩ R3 ∩ R4))
+1.5.10
+R1 = σ nomacteur=’Depardieu’ (ACTEUR ⋈ JOUER_UN_ROLE) 
+R2 = σ prenomacteur = ‘Gérard’ (ACTEUR ⋈ JOUER_UN_ROLE)
+R3 = σ nomacteur = ‘Clavier’ (ACTEUR ⋈ JOUER_UN_ROLE)
+R4 = σ prenomacteur = ‘Christian’ (ACTEUR ⋈ JOUER_UN_ROLE)
+π titrefilm, annee, duree, intgenre (FILM ⋈ ((R1 ∩ R2) ∪ (R3 ∩ R4)))
+1.5.11
+R1=σ titrefilm = ‘Rambo’(FILM)
+R2=σ titrefilm = ‘Asterix et Obélix’ (FILM)
+R3=σ titrefilm = ‘Faculty’ (FILM)
+π nompers, prenompers, adrpers, telpers (EMPRUNTEUR ⋈ EMPRUNT ⋈ EXEMPLAIRE ⋈ (R1 ∪ R2 ∪ R3)
+1.5.12
+π titrefilm, codepers (FILM ⋈ EXEMPLAIRE ⋈ EMPRUNT) ÷ π codepers(EMPRUNTEUR)
+1.5.13
+π titrefilm - π titrefilm (FILM ⋈ EXEMPLAIRE ⋈ EMPRUNT) 
+1.5.14
+π nomacteur, prenomacteur, codefilm (ACTEUR ⋈ JOUER_UN_ROLE ⋈ FIL
+ */
 -- 1.6.1
 BEGIN TRANSACTION;
 CREATE TABLE support (
