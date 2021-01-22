@@ -8,6 +8,8 @@ BEGIN
     FROM ligne_commande l
     JOIN produit p USING(id_produit) 
     WHERE id_commande = nom_cmd;
+    IF montant_ht IS NULL THEN montant_ht := 0;
+    END IF;
     SELECT CAST(id_remise AS numeric)/100 INTO remise 
     FROM commande
     WHERE id_commande = nom_cmd; 
