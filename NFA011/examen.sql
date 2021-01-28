@@ -26,4 +26,36 @@ FOR BonClients IN   (SELECT *,SUM(Montant) AS TotalMontant FROM Client
         END LOOP;
     RETURN nbrBonClient;
 END
+$$;
+
+CREATE OR REPLACE FUNCTION MontantNote(numNote Note.NoNote%TYPE) RETURNS numeric LANGUAGE plpgsql AS $$
+DECLARE
+TVA Note.TauxTVA%TYPE;
+montantHT numeric;
+BEGIN
+
+SELECT TauxTVA INTO TVA FROM Note WHERE NoNote = numNote;
+
+SELECT SUM(r.colPrix) INTO montantHT FROM (
+                                        SELECT (SUM(Quantite) * PrixPlat) AS colPrix
+                                        FROM Composer
+                                        JOIN Plat USING (NoPlat) 
+                                        WHERE NoNote = numNote 
+                                        GROUP BY NoPlat,PrixPlat) AS r;
+ 
+RETURN   montantHT *(1+TVA);  
+END
+$$;
+DROP FUNCTION MontantNote(numNote Note.NoNote%TYPE);
+
+CREATE OR REPLACE FUNCTION InserePlat(Libelle Plat.LibellePlat%TYPE, Prix Plat.PrixPlat%TYPE) RETURNS VOID LANGUAGE plpgsql AS $$
+DECLARE
+maxNumPlat integer;
+BEGIN
+    SELECT MAX(NoPlat) INTO maxNumPlat FROM Plat;
+    INSERT INTO Plat VALUES (MaxNumPlat+1,Libelle,Prix);
+END
 $$
+
+Select InserePlat('Salade',5.2);
+SELECT * FROM Client;
