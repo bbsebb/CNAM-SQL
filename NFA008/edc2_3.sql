@@ -111,8 +111,8 @@ DROP TRIGGER arch_film ON film;
 
 CREATE TRIGGER arch_film 
 AFTER DELETE 
-ON film FOR EACH 
-ROW EXECUTE PROCEDURE arch_film();
+ON film 
+FOR EACH ROW EXECUTE PROCEDURE arch_film();
 
 DELETE FROM film WHERE codefilm = 7 OR codefilm = 8;
 
@@ -120,16 +120,34 @@ DELETE FROM film WHERE codefilm = 7 OR codefilm = 8;
 CREATE TABLE emprunt_archive AS (SELECT * from emprunt WHERE 1=0);
 
 CREATE OR REPLACE FUNCTION archive_emprunt() RETURNS TRIGGER LANGUAGE plpgsql AS $archive_emprunt$
+DECLARE
 nbrEnr int;
 emprunt_obsolete emprunt%ROWTYPE;
 BEGIN
+    -- on compte le nombre d'emprunt avec une date de retour
     SELECT COUNT(*) INTO nbrEnr FROM emprunt WHERE dateretour IS NOT NULL;
+    -- Si nbr d'emprunt superieur à 10
     IF nbrEnr > 10 THEN
+        -- On parcours tous ces emprunts pour les transferer
         FOR emprunt_obsolete IN (SELECT * FROM emprunt WHERE dateretour IS NOT NULL)
             LOOP
                 INSERT INTO emprunt_archive VALUES (emprunt_obsolete.*);
-                DELETE FROM emprunt WHERE codefilm = 
+                DELETE FROM emprunt WHERE codefilm = emprunt_obsolete.codefilm
+                AND numexemplaire = emprunt_obsolete.numexemplaire 
+                AND codepers = emprunt_obsolete.codepers AND datepret =  emprunt_obsolete.datepret;
             END LOOP;
     END IF;
+    RETURN NEW;
 END
 $archive_emprunt$;
+
+CREATE TRIGGER archive_emprunt 
+AFTER UPDATE OR INSERT 
+ON emprunt 
+FOR EACH ROW EXECUTE PROCEDURE archive_emprunt(); 
+
+SELECT * from emprunt;
+SELECT * from emprunt_archive;
+UPDATE emprunt SET dateretour = CURRENT_DATE WHERE codefilm = 12 AND codepers=2;
+SELECT * from emprunt;
+SELECT * from emprunt_archive;
