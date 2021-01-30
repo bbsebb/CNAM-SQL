@@ -1,61 +1,83 @@
-CREATE TABLE DonnerLieu (
-    Code varchar,
-    Ref varchar,
-    PRIMARY KEY (Code,Ref),
-    FOREIGN KEY (code) REFERENCES Client (code),
-    FOREIGN KEY (Ref) REFERENCES Facture (Ref) 
-);
 
-CREATE OR REPLACE FUNCTION majBonClient( montantBC BonClient.TotalMontant%TYPE) RETURNS integer LANGUAGE plpgsql $$
+
+CREATE OR REPLACE FUNCTION InsererRdv(dateF Lecon.Date%TYPE,heureF Lecon.Heure%TYPE, dureeF Lecon.Duree%TYPE, lieuRdvF Lecon.LieuRdv%TYPE, 
+                                    codeMoniteurF Lecon.CodeMoniteur%TYPE, numeroEleveF Lecon.NumeroEleve%TYPE, immatriculationF Lecon.Immatriculation%TYPE) RETURNS boolean LANGUAGE plpgsql AS $$
 DECLARE
-nbrBonClient = 0 integer;
-BonClients RECORD;
-
+newNumLecon Lecon.NumLecon%TYPE;
 BEGIN
-TRUNCATE TABLE BonClient;
+    -- On verifie si le code moniteur existe
+    PERFORM * FROM Moniteur WHERE CodeMoniteur = codeMoniteurF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
+    -- On verifie si le numéro d'éléve existe
+    PERFORM * FROM Eleve WHERE NumeroEleve = numeroEleveF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
+    -- On verifie si l'immatriculation' existe
+    PERFORM * FROM Vehicule WHERE Immatriculation = immatriculationF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
 
+    -- Toutes les verifications sont correctes
+    -- On cherche le dernier numéro de la clé primaire de la table 'Lecon'
+    SELECT MAX(NumLecon) + 1 INTO newNumLecon FROM Lecon;
+    -- On ajoute les données dans la table 'Lecon'
+    INSERT INTO Lecon VALUES (newNumLecon,dateF,heureF, dureeF, lieuRdvF, codeMoniteurF, numeroEleveF, immatriculationF);
+       
+    -- On verifie qu'une donnée a bien été inserée sinon on renvoie false;
+    IF FOUND THEN 
+        RETURN true;
+    ELSE 
+        RETURN false;
+    END IF;
 
-FOR BonClients IN   (SELECT *,SUM(Montant) AS TotalMontant FROM Client
-                    JOIN DonnerLieu USING(Code)
-                    JOIN Facture USING(Ref) 
-                    GROUP BY Code 
-                    HAVING SUM(Montant) >= montantBC)
-        LOOP
-            INSERT INTO BonClient VALUES (BonClients.Code, BonClients.TotalMontant);
-            nbrBonClient ++;
-        END LOOP;
-    RETURN nbrBonClient;
 END
 $$;
 
-CREATE OR REPLACE FUNCTION MontantNote(numNote Note.NoNote%TYPE) RETURNS numeric LANGUAGE plpgsql AS $$
+DROP FUNCTION InsererRdv (dateF Lecon.Date%TYPE,heureF Lecon.Heure%TYPE, dureeF Lecon.Duree%TYPE, lieuRdvF Lecon.LieuRdv%TYPE, 
+                                    codeMoniteurF Lecon.CodeMoniteur%TYPE, numeroEleveF Lecon.NumeroEleve%TYPE, immatriculationF Lecon.Immatriculation%TYPE);
+
+
+
+CREATE OR REPLACE FUNCTION InsererRdv(dateF Lecon.Date%TYPE,heureF Lecon.Heure%TYPE, dureeF Lecon.Duree%TYPE, lieuRdvF Lecon.LieuRdv%TYPE, 
+                                    codeMoniteurF Lecon.CodeMoniteur%TYPE, numeroEleveF Lecon.NumeroEleve%TYPE, immatriculationF Lecon.Immatriculation%TYPE) RETURNS boolean LANGUAGE plpgsql AS $$
 DECLARE
-TVA Note.TauxTVA%TYPE;
-montantHT numeric;
+newNumLecon Lecon.NumLecon%TYPE;
 BEGIN
+    -- On verifie si le code moniteur existe
+    PERFORM * FROM Moniteur WHERE CodeMoniteur = codeMoniteurF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
+    -- On verifie si le numéro d'éléve existe
+    PERFORM * FROM Eleve WHERE NumeroEleve = numeroEleveF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
+    -- On verifie si l'immatriculation' existe
+    PERFORM * FROM Vehicule WHERE Immatriculation = immatriculationF;
+    IF NOT FOUND THEN 
+        RETURN false; -- Si il n'existe pas, on returne false et on arrête la fonction
+    END IF;
 
-SELECT TauxTVA INTO TVA FROM Note WHERE NoNote = numNote;
+    -- Toutes les verifications sont correctes
+    -- On cherche le dernier numéro de la clé primaire de la table 'Lecon'
+    SELECT MAX(NumLecon) + 1 INTO newNumLecon FROM Lecon;
+    -- On ajoute les données dans la table 'Lecon'
+    INSERT INTO Lecon VALUES (newNumLecon,dateF,heureF, dureeF, lieuRdvF, codeMoniteurF, numeroEleveF, immatriculationF);
+       
+    -- On verifie qu'une donnée a bien été inserée sinon on renvoie false;
+    IF FOUND THEN 
+        RETURN true;
+    ELSE 
+        RETURN false;
+    END IF;
 
-SELECT SUM(r.colPrix) INTO montantHT FROM (
-                                        SELECT (SUM(Quantite) * PrixPlat) AS colPrix
-                                        FROM Composer
-                                        JOIN Plat USING (NoPlat) 
-                                        WHERE NoNote = numNote 
-                                        GROUP BY NoPlat,PrixPlat) AS r;
- 
-RETURN   montantHT *(1+TVA);  
 END
 $$;
-DROP FUNCTION MontantNote(numNote Note.NoNote%TYPE);
 
-CREATE OR REPLACE FUNCTION InserePlat(Libelle Plat.LibellePlat%TYPE, Prix Plat.PrixPlat%TYPE) RETURNS VOID LANGUAGE plpgsql AS $$
-DECLARE
-maxNumPlat integer;
-BEGIN
-    SELECT MAX(NoPlat) INTO maxNumPlat FROM Plat;
-    INSERT INTO Plat VALUES (MaxNumPlat+1,Libelle,Prix);
-END
-$$
-
-Select InserePlat('Salade',5.2);
-SELECT * FROM Client;
+DROP FUNCTION InsererRdv (dateF Lecon.Date%TYPE,heureF Lecon.Heure%TYPE, dureeF Lecon.Duree%TYPE, lieuRdvF Lecon.LieuRdv%TYPE, 
+                                    codeMoniteurF Lecon.CodeMoniteur%TYPE, numeroEleveF Lecon.NumeroEleve%TYPE, immatriculationF Lecon.Immatriculation%TYPE);
